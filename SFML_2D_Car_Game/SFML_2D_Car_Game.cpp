@@ -52,10 +52,10 @@ public:
 
 Backround::Backround()
 {
-    backround.loadFromFile(back_image_name);
-    back_texture.loadFromImage(backround);
-    back_sprite.setTexture(back_texture);
-    back_sprite.setPosition(X_backround_pos, Y_backround_pos);
+    this->backround.loadFromFile(this->back_image_name);
+    this->back_texture.loadFromImage(this->backround);
+    this->back_sprite.setTexture(this->back_texture);
+    this->back_sprite.setPosition((int)this->X_backround_pos, (int)this->Y_backround_pos);
 }
 
 void Backround::print_backround(sf::RenderWindow& RWindow)
@@ -87,9 +87,9 @@ public:
 
 Road::Road()
 {
-    road_image.loadFromFile(road_image_name);
-    road_texture.loadFromImage(road_image);
-    road_sprite.setTexture(road_texture);
+    this->road_image.loadFromFile(this->road_image_name);
+    this->road_texture.loadFromImage(this->road_image);
+    this->road_sprite.setTexture(this->road_texture);
     for (int i = 0; i < road_amount; ++i)
     {
         vec_road.push_back(road_sprite);
@@ -124,20 +124,66 @@ void Road::move_road(sf::RenderWindow& RWindow, float speed)
             vec_y_pos[i] = y_start_map; 
             vec_road[i].setPosition(X_road_pos, vec_y_pos[i]); 
         }
-        RWindow.draw(vec_road[i]);
         vec_road[i].move(0, speed);
     }
 }
 
 class Car
 {
-private:
-
 protected:
-
+    float x_car_pos = 0, y_car_pos = 0;
+    std::string car_image_name = "";
+    sf::Image car_image;
+    sf::Texture car_texture;
+    sf::Sprite car_sprite;
 public:
-
+    virtual void Init_car() = 0;
+    virtual void draw_car(sf::RenderWindow& RWindow) = 0;
 };
+
+class Green_Car : Car
+{
+public:
+    void Init_car();
+    void draw_car(sf::RenderWindow& RWindow);
+};
+
+void Green_Car::Init_car()
+{
+    this->x_car_pos = 550; this->y_car_pos = 600;
+    this->car_image_name = "../Images/Cars/Car_3.png";
+    this->car_image.loadFromFile(this->car_image_name);
+    this->car_texture.loadFromImage(this->car_image);
+    this->car_sprite.setTexture(this->car_texture);
+    this->car_sprite.setPosition(this->x_car_pos, this->y_car_pos);
+}
+
+void Green_Car::draw_car(sf::RenderWindow& RWindow)
+{
+    RWindow.draw(this->car_sprite);
+}
+
+class White_Car : Car
+{
+public:
+    void Init_car();
+    void draw_car(sf::RenderWindow& RWindow);
+};
+
+void White_Car::Init_car()
+{
+    this->x_car_pos = 560; this->y_car_pos = 600;
+    this->car_image_name = "../Images/Cars/Car_2.png";
+    this->car_image.loadFromFile(car_image_name);
+    this->car_texture.loadFromImage(car_image);
+    this->car_sprite.setTexture(car_texture);
+    this->car_sprite.setPosition(x_car_pos, y_car_pos);
+}
+
+void White_Car::draw_car(sf::RenderWindow& RWindow)
+{
+    RWindow.draw(car_sprite);
+}
 
 class Game_logic
 {
@@ -145,6 +191,7 @@ private:
     Mouse _mouse;
     Backround _backround;
     Road _road;
+    White_Car _car;
 public:
     Game_logic();
     void draw_elems(sf::RenderWindow& RWindow);
@@ -153,12 +200,14 @@ public:
 Game_logic::Game_logic()
 {
     _road.init_pos();
+    _car.Init_car();
 }
 
 void Game_logic::draw_elems(sf::RenderWindow& RWindow)
 {
     _mouse.update_poz(RWindow);
     _road.draw_road(RWindow);
+    _car.draw_car(RWindow);
     _road.move_road(RWindow, 0.3);
     _backround.print_backround(RWindow);
 }
